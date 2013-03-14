@@ -13,17 +13,22 @@ MC_JAR="minecraft_server.jar"
 # Name of craftbukkit jar 
 CB_JAR="craftbukkit.jar"
 
+SP_JAR="spigot.jar"
+
 # Define the release of CraftBukkit to use (stable or unstable)
 CB_RELEASE="stable"
 
+# Define the release of Spigot to use (stable or unstable)
+SP_RELEASE="stable"
+
 # Name of server.jar to use (either $MC_JAR or $CB_JAR)
-SERVICE=$CB_JAR
+SERVICE=$SP_JAR
 
 # Name to use for the screen instance
 SCREEN="server_screen"
 
 # User that should run the server
-USERNAME="minecraft"
+USERNAME="travis"
 
 # Path to minecraft server directory 
 MCPATH="/home/${USERNAME}/minecraft"

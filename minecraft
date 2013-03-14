@@ -428,6 +428,39 @@ check_update_craftbukkit() {
 	fi
 }
 
+get_sp_release_channel() {
+	case $SP_RELEASE in
+		unstable|UNSTABLE|Unstable|dev|development)
+			echo "http://ci.md-5.net/job/Spigot/lastSuccessfulBuild/artifact/Spigot-Server/target/spigot.jar"
+		;;
+		*)
+			echo "http://ci.md-5.net/job/Spigot/lastStableBuild/artifact/Spigot-Server/target/spigot.jar"
+		;;
+	esac
+}
+
+check_update_spigot() {
+	echo "Checking for update for spigot.jar"
+	echo "You are on release channel \"$SP_RELEASE\""
+
+	as_user "cd $MCPATH && wget -q -O $MCPATH/spigot.jar.update $(get_sp_release_channel)"
+	echo "$(get_sp_release_channel)"
+	if [ -r "$MCPATH/spigot.jar.update" ]
+	then
+		if `diff $MCPATH/$SP_JAR $MCPATH/spigot.jar.update >/dev/null`
+		then
+			echo "You are already running the latest version of spigot.jar."
+			return 1
+		else
+			echo "Update of $SP_JAR is needed."
+			return 0
+		fi
+	else
+		echo "Something went wrong. Couldn't download spigot.jar"
+	fi
+}
+
+
 mc_update() {
 	if is_running
 	then
@@ -460,6 +493,21 @@ mc_update() {
 			echo "Not updating $CB_JAR. It's not necessary"
 			as_user "rm $MCPATH/craftbukkit.jar.update"
 		fi
+
+		if check_update_spigot
+		then
+			if [ -r "$MCPATH/spigot.jar.update" ]
+			then
+				as_user "mv $MCPATH/spigot.jar.update $MCPATH/$SP_JAR"
+				echo "Thats it. Update of $SP_JAR done."
+			else
+				echo "Something went wrong. Couldn't replace your original $SP_JAR with spigot.jar.update"
+			fi
+		else
+			echo "Not updating $SP_JAR. It's not necessary"
+			as_user "rm $MCPATH/spigot.jar.update"
+		fi
+
 	fi
 }
 
